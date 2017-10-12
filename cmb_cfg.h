@@ -57,7 +57,7 @@
 /* language of print information */
 #if defined(PKG_CMBACKTRACE_PRINT_ENGLISH)
     #define CMB_PRINT_LANGUAGE         CMB_PRINT_LANGUAGE_ENGLISH
-#if defined(PKG_CMBACKTRACE_PRINT_CHINESE)
+#elif defined(PKG_CMBACKTRACE_PRINT_CHINESE)
     #define CMB_PRINT_LANGUAGE         CMB_PRINT_LANUUAGE_CHINESE
 #endif /* PKG_CMBACKTRACE_PRINT_ENGLISH */
 #endif /* _CMB_CFG_H_ */
