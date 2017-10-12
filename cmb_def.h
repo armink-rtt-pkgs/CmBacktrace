@@ -34,7 +34,7 @@
 #include <stdlib.h>
 
 /* library software version number */
-#define CMB_SW_VERSION                "1.0.0"
+#define CMB_SW_VERSION                "1.0.2"
 
 #define CMB_CPU_ARM_CORTEX_M0          0
 #define CMB_CPU_ARM_CORTEX_M3          1
@@ -287,10 +287,6 @@ if (!(EXPR))                                                                   \
 
 #ifndef CMB_CPU_PLATFORM_TYPE
     #error "CMB_CPU_PLATFORM_TYPE isn't defined in 'cmb_cfg.h'"
-#endif
-
-#if __STDC_VERSION__ < 199901L
-    #error "not supported compiler, must be C99 or higher. try to add '-std=c99' to compile parameters"
 #endif
 
 #if (defined(CMB_USING_BARE_METAL_PLATFORM) && defined(CMB_USING_OS_PLATFORM))
