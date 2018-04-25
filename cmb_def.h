@@ -1,7 +1,7 @@
 /*
  * This file is part of the CmBacktrace Library.
  *
- * Copyright (c) 2016-2017, Armink, <armink.ztl@gmail.com>
+ * Copyright (c) 2016-2018, Armink, <armink.ztl@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -34,7 +34,7 @@
 #include <stdlib.h>
 
 /* library software version number */
-#define CMB_SW_VERSION                "1.1.2"
+#define CMB_SW_VERSION                "1.2.0"
 
 #define CMB_CPU_ARM_CORTEX_M0          0
 #define CMB_CPU_ARM_CORTEX_M3          1
@@ -301,7 +301,6 @@ if (!(EXPR))                                                                   \
         #include <ucos_ii.h>
     #elif (CMB_OS_PLATFORM_TYPE == CMB_OS_PLATFORM_UCOSIII)
         #include <os.h>
-        //TODO ´ý²âÊÔ
     #elif (CMB_OS_PLATFORM_TYPE == CMB_OS_PLATFORM_FREERTOS)
         #include <FreeRTOS.h>  
         extern uint32_t *vTaskStackAddr(void);/* need to modify the FreeRTOS/tasks source code */
@@ -327,24 +326,25 @@ if (!(EXPR))                                                                   \
         bx lr
     }
 #elif defined(__ICCARM__)
+/* IAR iccarm specific functions */
+/* Close Raw Asm Code Warning */  
+#pragma diag_suppress=Pe940    
     static uint32_t cmb_get_msp(void)
     {
-        register uint32_t result;
-        __asm("MRS %0, msp" : "=r" (result));
-        return(result);
+      __asm("mrs r0, msp");
+      __asm("bx lr");        
     }
     static uint32_t cmb_get_psp(void)
     {
-        register uint32_t result;
-        __asm("MRS %0, psp" : "=r" (result));
-        return(result);
+      __asm("mrs r0, psp");
+      __asm("bx lr");        
     }
     static uint32_t cmb_get_sp(void)
     {
-        register uint32_t result;
-        __asm("MOV %0, sp" : "=r" (result));
-        return(result);
+      __asm("mov r0, sp");
+      __asm("bx lr");       
     }
+#pragma diag_default=Pe940  
 #elif defined(__GNUC__)
     __attribute__( ( always_inline ) ) static inline uint32_t cmb_get_msp(void) {
         register uint32_t result;
