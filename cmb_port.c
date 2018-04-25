@@ -34,14 +34,14 @@
 #define CMB_LR_WORD_OFFSET   6
 #endif 
 
-#ifndef CMB_SP_WORD_OFFSET
-#define CMB_SP_WORD_OFFSET   7   
-#endif 
+#define CMB_SP_WORD_OFFSET   (CMB_LR_WORD_OFFSET + 1)
 
 #if defined(__CC_ARM)
     #pragma O1
 #elif defined(__ICCARM__)
     #pragma optimize=none
+#elif defined(__GNUC__)
+    #pragma GCC optimize ("O0")
 #endif
 RT_WEAK rt_err_t exception_hook(void *context) {
     extern long list_thread(void);
