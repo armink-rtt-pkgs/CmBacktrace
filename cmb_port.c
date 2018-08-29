@@ -76,7 +76,11 @@ RT_WEAK rt_err_t exception_hook(void *context) {
 #endif
 
     /* the PSP is changed by RT-Thread HardFault_Handler, so restore it to HardFault context */
+#if (defined (__VFP_FP__) && !defined(__SOFTFP__)) || (defined (__ARMVFP__)) || (defined(__ARM_PCS_VFP) || defined(__TARGET_FPU_VFP))
+    cmb_set_psp(cmb_get_psp() + 4 * 10);
+#else
     cmb_set_psp(cmb_get_psp() + 4 * 9);
+#endif
 
     cm_backtrace_fault(*((uint32_t *)(cmb_get_sp() + sizeof(uint32_t) * CMB_LR_WORD_OFFSET)), cmb_get_sp() + sizeof(uint32_t) * CMB_SP_WORD_OFFSET);
 
