@@ -43,6 +43,28 @@
 #elif defined(__GNUC__)
     #pragma GCC optimize ("O0")
 #endif
+
+#if defined(__CC_ARM)
+    static __inline __asm void cmb_set_psp(uint32_t psp) {
+        msr psp, r0
+    }
+#elif defined(__ICCARM__)
+/* IAR iccarm specific functions */
+/* Close Raw Asm Code Warning */
+#pragma diag_suppress=Pe940
+    static void cmb_set_psp(uint32_t psp)
+    {
+      __asm("msr psp, r0");
+    }
+#pragma diag_default=Pe940
+#elif defined(__GNUC__)
+    __attribute__( ( always_inline ) ) static inline void cmb_set_psp(uint32_t psp) {
+        __asm volatile ("MSR psp, %0\n\t" :: "r" (psp) );
+    }
+#else
+    #error "not supported compiler"
+#endif
+
 RT_WEAK rt_err_t exception_hook(void *context) {
     extern long list_thread(void);
     volatile uint8_t _continue = 1;
@@ -52,6 +74,9 @@ RT_WEAK rt_err_t exception_hook(void *context) {
 #ifdef RT_USING_FINSH
     list_thread();
 #endif
+
+    /* the PSP is changed by RT-Thread HardFault_Handler, so restore it to HardFault context */
+    cmb_set_psp(cmb_get_psp() + 4 * 9);
 
     cm_backtrace_fault(*((uint32_t *)(cmb_get_sp() + sizeof(uint32_t) * CMB_LR_WORD_OFFSET)), cmb_get_sp() + sizeof(uint32_t) * CMB_SP_WORD_OFFSET);
 
