@@ -31,7 +31,12 @@
 
 /* print line, must config by user */
 #include <rtthread.h>
+#ifndef RT_USING_ULOG
 #define cmb_println(...)               rt_kprintf(__VA_ARGS__);rt_kprintf("\r\n")
+#else
+#include <ulog.h>
+#define cmb_println(...)               ulog_e("cmb", __VA_ARGS__);ulog_flush()
+#endif /* RT_USING_ULOG */
 /* enable bare metal(no OS) platform */
 /* #define CMB_USING_BARE_METAL_PLATFORM */
 /* enable OS platform */
