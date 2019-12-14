@@ -35,7 +35,8 @@
 #define cmb_println(...)               rt_kprintf(__VA_ARGS__);rt_kprintf("\r\n")
 #else
 #include <ulog.h>
-#define cmb_println(...)               ulog_e("cmb", __VA_ARGS__);ulog_flush()
+#define CMB_LOG_TAG                    "cmb"
+#define cmb_println(...)               ulog_e(CMB_LOG_TAG, __VA_ARGS__);ulog_flush()
 #endif /* RT_USING_ULOG */
 /* enable bare metal(no OS) platform */
 /* #define CMB_USING_BARE_METAL_PLATFORM */

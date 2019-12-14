@@ -84,6 +84,8 @@ RT_WEAK rt_err_t exception_hook(void *context) {
 
     cm_backtrace_fault(*((uint32_t *)(cmb_get_sp() + sizeof(uint32_t) * CMB_LR_WORD_OFFSET)), cmb_get_sp() + sizeof(uint32_t) * CMB_SP_WORD_OFFSET);
 
+    cmb_println("Current system tick: %ld", rt_tick_get());
+
     while (_continue == 1);
 
     return RT_EOK;
