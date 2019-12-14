@@ -25,6 +25,7 @@
 #endif
 
 #include <fal.h>
+#include <dfs_posix.h>
 
 #define CMB_FLASH_LOG_PART             "cmb_log"
 #define CMB_LOG_PATH                   "/log/cmb.log"
@@ -51,8 +52,11 @@ static const struct fal_partition *cmb_log_part = NULL;
 void cmb_flash_log_write(const char *log, size_t len)
 {
     static uint32_t addr = 0;
+    uint8_t len_buf[CMB_LOG_LEN_SIZE] = { 0 };
+
     /* write log length */
-    fal_partition_write(cmb_log_part, addr, (uint8_t *)&len, sizeof(size_t));
+    rt_memcpy(len_buf, (uint8_t *)&len, sizeof(size_t));
+    fal_partition_write(cmb_log_part, addr, len_buf, sizeof(len_buf));
     addr += CMB_LOG_LEN_SIZE;
     /* write log content */
     fal_partition_write(cmb_log_part, addr, (uint8_t *)log, len);
@@ -98,7 +102,7 @@ int cmb_backup_flash_log_to_file(void)
     size_t len;
     uint32_t addr = 0;
     rt_bool_t has_read_log = RT_FALSE;
-    FILE *log_fp = NULL;
+    int log_fd = -1;
 
     while (1)
     {
@@ -112,8 +116,8 @@ int cmb_backup_flash_log_to_file(void)
                 has_read_log = RT_TRUE;
                 LOG_I("An CmBacktrace log was found on flash. Now will backup it to file ("CMB_LOG_PATH").");
                 //TODO check the folder
-                log_fp = fopen(CMB_LOG_PATH, "a+");
-                if (!log_fp) {
+                log_fd = open(CMB_LOG_PATH, O_WRONLY | O_CREAT | O_APPEND);
+                if (log_fd < 0) {
                     LOG_E("Open file ("CMB_LOG_PATH") failed.");
                     break;
                 }
@@ -123,7 +127,7 @@ int cmb_backup_flash_log_to_file(void)
             fal_partition_read(cmb_log_part, addr, (uint8_t *)log_buf, MIN(ULOG_LINE_BUF_SIZE, len));
             addr += RT_ALIGN(len, CMB_FLASH_LOG_PART_WG);
             /* backup log to file */
-            fwrite(log_buf, MIN(ULOG_LINE_BUF_SIZE, len), 1, log_fp);
+            write(log_fd, log_buf, MIN(ULOG_LINE_BUF_SIZE, len));
         }
         else
         {
@@ -133,10 +137,10 @@ int cmb_backup_flash_log_to_file(void)
 
     if (has_read_log)
     {
-        if (log_fp)
+        if (log_fd >= 0)
         {
             LOG_I("Backup the CmBacktrace flash log to file ("CMB_LOG_PATH") successful.");
-            fclose(log_fp);
+            close(log_fd);
         }
         fal_partition_erase_all(cmb_log_part);
     }
