@@ -67,7 +67,10 @@ void cmb_flash_log_write(const char *log, size_t len)
 
     if (first_write)
     {
+#ifndef CMB_USING_FAL_BACKUP_LOG_TO_FILE
         fal_partition_erase_all(cmb_log_part);
+#endif
+
         first_write = RT_FALSE;
     }
 
@@ -179,6 +182,7 @@ int cmb_backup_flash_log_to_file(void)
         {
             LOG_I("Backup the CmBacktrace flash log to file ("CMB_LOG_FILE_PATH") successful.");
             close(log_fd);
+            fal_partition_erase_all(cmb_log_part);
         }
     }
 
