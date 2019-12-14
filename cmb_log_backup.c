@@ -91,7 +91,26 @@ int ulog_cmb_flash_log_backend_init(void)
 INIT_APP_EXPORT(ulog_cmb_flash_log_backend_init);
 
 #else
-/* may be using rt_kprinf? */
+void cmb_flash_log_println(const char *fmt, ...)
+{
+    va_list args;
+    rt_size_t length;
+    static char rt_log_buf[RT_CONSOLEBUF_SIZE];
+
+    va_start(args, fmt);
+
+    length = rt_vsnprintf(rt_log_buf, sizeof(rt_log_buf) - 1, fmt, args);
+    if (length > RT_CONSOLEBUF_SIZE - 1 - 2)
+        length = RT_CONSOLEBUF_SIZE - 3;
+
+    /* add CRLF */
+    rt_log_buf[length++] = '\r';
+    rt_log_buf[length++] = '\n';
+
+    cmb_flash_log_write(rt_log_buf, length);
+
+    va_end(args);
+}
 #endif /* RT_USING_ULOG */
 
 int cmb_backup_flash_log_to_file(void)
