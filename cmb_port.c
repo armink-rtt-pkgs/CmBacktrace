@@ -66,12 +66,12 @@
 #endif
 
 RT_WEAK rt_err_t exception_hook(void *context) {
-    extern long list_thread(void);
     volatile uint8_t _continue = 1;
         
     rt_enter_critical();
 
 #ifdef RT_USING_FINSH
+    extern long list_thread(void);
     list_thread();
 #endif
 
@@ -97,6 +97,7 @@ RT_WEAK void assert_hook(const char* ex, const char* func, rt_size_t line) {
     rt_enter_critical();
 
 #ifdef RT_USING_FINSH
+    extern long list_thread(void);
     list_thread();
 #endif
 
