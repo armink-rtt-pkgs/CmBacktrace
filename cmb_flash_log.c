@@ -16,8 +16,8 @@
 #include <stdio.h>
 #include <cm_backtrace.h>
 
-#define CMB_USING_FAL_FLASH_LOG
-#define CMB_USING_FAL_BACKUP_LOG_TO_FILE
+//#define CMB_USING_FAL_FLASH_LOG
+//#define CMB_USING_FAL_BACKUP_LOG_TO_FILE
 
 #if defined(CMB_USING_FAL_FLASH_LOG)
 
