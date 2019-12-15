@@ -30,12 +30,6 @@
 #include <cm_backtrace.h>
 #include <string.h>
 
-#ifndef CMB_LR_WORD_OFFSET
-#define CMB_LR_WORD_OFFSET   6
-#endif 
-
-#define CMB_SP_WORD_OFFSET   (CMB_LR_WORD_OFFSET + 1)
-
 #if defined(__CC_ARM)
     #pragma O1
 #elif defined(__ICCARM__)
@@ -67,6 +61,18 @@
 
 RT_WEAK rt_err_t exception_hook(void *context) {
     volatile uint8_t _continue = 1;
+    uint8_t lr_offset = 0;
+    uint32_t lr;
+
+#define CMB_LR_WORD_OFFSET_START       10
+#define CMB_LR_WORD_OFFSET_END         20
+#define CMB_SP_WORD_OFFSET             (lr_offset + 1)
+
+#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M0) || (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M3)
+#define EXC_RETURN_MASK                0x0000000F // Bits[31:4]
+#else
+#define EXC_RETURN_MASK                0x0000000F // Bits[31:5]
+#endif
         
     rt_enter_critical();
 
@@ -82,7 +88,27 @@ RT_WEAK rt_err_t exception_hook(void *context) {
     cmb_set_psp(cmb_get_psp() + 4 * 9);
 #endif
 
-    cm_backtrace_fault(*((uint32_t *)(cmb_get_sp() + sizeof(uint32_t) * CMB_LR_WORD_OFFSET)), cmb_get_sp() + sizeof(uint32_t) * CMB_SP_WORD_OFFSET);
+    /* auto calculate the LR offset */
+    for (lr_offset = CMB_LR_WORD_OFFSET_START; lr_offset <= CMB_LR_WORD_OFFSET_END; lr_offset ++)
+    {
+        lr = *((uint32_t *)(cmb_get_sp() + sizeof(uint32_t) * lr_offset));
+        /*
+         * Cortex-M0: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0497a/Babefdjc.html
+         * Cortex-M3: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0552a/Babefdjc.html
+         * Cortex-M4: http://infocenter.arm.com/help/topic/com.arm.doc.dui0553b/DUI0553.pdf P41
+         * Cortex-M7: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0646c/Babefdjc.html
+         */
+        if ((lr == 0xFFFFFFF1) || (lr == 0xFFFFFFF9) || (lr == 0xFFFFFFFD)
+#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M4) || (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M3)
+            || (lr == 0xFFFFFFE1) || (lr == 0xFFFFFFE9) || (lr == 0xFFFFFFED)
+#endif
+           )
+        {
+            break;
+        }
+    }
+
+    cm_backtrace_fault(lr, cmb_get_sp() + sizeof(uint32_t) * CMB_SP_WORD_OFFSET);
 
     cmb_println("Current system tick: %ld", rt_tick_get());
 
@@ -136,7 +162,7 @@ long cmb_test(int argc, char **argv) {
     {
         *SCB_CCR |= (1 << 4); /* bit4: DIV_0_TRP. */
         x = 10;
-        y = 0;
+        y = rt_strlen("");
         z = x / y;
         rt_kprintf("z:%d\n", z);
         
