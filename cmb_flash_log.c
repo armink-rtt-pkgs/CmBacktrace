@@ -67,10 +67,7 @@ void cmb_flash_log_write(const char *log, size_t len)
 
     if (first_write)
     {
-#ifndef CMB_USING_FAL_BACKUP_LOG_TO_FILE
         fal_partition_erase_all(cmb_log_part);
-#endif
-
         first_write = RT_FALSE;
     }
 
