@@ -66,7 +66,7 @@ RT_WEAK rt_err_t exception_hook(void *context) {
     uint8_t lr_offset = 0;
     uint32_t lr;
 
-#define CMB_LR_WORD_OFFSET_START       10
+#define CMB_LR_WORD_OFFSET_START       6
 #define CMB_LR_WORD_OFFSET_END         20
 #define CMB_SP_WORD_OFFSET             (lr_offset + 1)
 
