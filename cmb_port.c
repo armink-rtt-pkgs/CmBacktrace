@@ -41,6 +41,7 @@
 #if defined(__CC_ARM)
     static __inline __asm void cmb_set_psp(uint32_t psp) {
         msr psp, r0
+        bx lr
     }
 #elif defined(__ICCARM__)
 /* IAR iccarm specific functions */
@@ -49,6 +50,7 @@
     static void cmb_set_psp(uint32_t psp)
     {
       __asm("msr psp, r0");
+      __asm("bx lr");
     }
 #pragma diag_default=Pe940
 #elif defined(__GNUC__)
