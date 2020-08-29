@@ -274,7 +274,7 @@ if (!(EXPR))                                                                   \
 }
 
 /* ELF(Executable and Linking Format) file extension name for each compiler */
-#if defined(__CC_ARM)
+#if defined(__CC_ARM) || defined(__CLANG_ARM)
     #define CMB_ELF_FILE_EXTENSION_NAME          ".axf"
 #elif defined(__ICCARM__)
     #define CMB_ELF_FILE_EXTENSION_NAME          ".out"
