@@ -24,9 +24,6 @@
  *
  * Function: It is the configure head file for this library.
  * Created on: 2016-12-15
- * Change Logs:
- * Date           Author                                 Notes
- * 2020-08-26     Chenxuan(chenxuan.zhao@icloud.com)     Fixed bug
  */
 
 #ifndef _CMB_CFG_H_
