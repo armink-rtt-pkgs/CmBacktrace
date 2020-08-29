@@ -24,6 +24,9 @@
  *
  * Function: It is the configure head file for this library.
  * Created on: 2016-12-15
+ * Change Logs:
+ * Date           Author                                 Notes
+ * 2020-08-26     Chenxuan(chenxuan.zhao@icloud.com)     Fixed bug
  */
 
 #ifndef _CMB_CFG_H_
@@ -69,6 +72,6 @@ extern void cmb_flash_log_println(const char *fmt, ...);
 #if defined(PKG_CMBACKTRACE_PRINT_ENGLISH)
     #define CMB_PRINT_LANGUAGE         CMB_PRINT_LANGUAGE_ENGLISH
 #elif defined(PKG_CMBACKTRACE_PRINT_CHINESE)
-    #define CMB_PRINT_LANGUAGE         CMB_PRINT_LANGUAGE_ENGLISH
+    #define CMB_PRINT_LANGUAGE         CMB_PRINT_LANGUAGE_CHINESE
 #endif /* PKG_CMBACKTRACE_PRINT_ENGLISH */
 #endif /* _CMB_CFG_H_ */
