@@ -69,6 +69,6 @@ extern void cmb_flash_log_println(const char *fmt, ...);
 #if defined(PKG_CMBACKTRACE_PRINT_ENGLISH)
     #define CMB_PRINT_LANGUAGE         CMB_PRINT_LANGUAGE_ENGLISH
 #elif defined(PKG_CMBACKTRACE_PRINT_CHINESE)
-    #define CMB_PRINT_LANGUAGE         CMB_PRINT_LANGUAGE_ENGLISH
+    #define CMB_PRINT_LANGUAGE         CMB_PRINT_LANGUAGE_CHINESE
 #endif /* PKG_CMBACKTRACE_PRINT_ENGLISH */
 #endif /* _CMB_CFG_H_ */
