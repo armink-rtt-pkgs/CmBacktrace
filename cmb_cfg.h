@@ -31,6 +31,7 @@
 
 /* print line, must config by user */
 #include <rtthread.h>
+
 #ifndef RT_USING_ULOG
 #ifndef CMB_USING_FLASH_LOG_BACKUP
 #define cmb_println(...)               rt_kprintf(__VA_ARGS__);rt_kprintf("\r\n")
@@ -43,12 +44,14 @@ extern void cmb_flash_log_println(const char *fmt, ...);
 #define CMB_LOG_TAG                    "cmb"
 #define cmb_println(...)               ulog_e(CMB_LOG_TAG, __VA_ARGS__);ulog_flush()
 #endif /* RT_USING_ULOG */
+
 /* enable bare metal(no OS) platform */
 /* #define CMB_USING_BARE_METAL_PLATFORM */
 /* enable OS platform */
 #define CMB_USING_OS_PLATFORM
 /* OS platform type, must config when CMB_USING_OS_PLATFORM is enable */
 #define CMB_OS_PLATFORM_TYPE           CMB_OS_PLATFORM_RTT
+
 /* cpu platform type, must config by user */
 #if defined(PKG_CMBACKTRACE_PLATFORM_M0_M0PLUS)
     #define CMB_CPU_PLATFORM_TYPE      CMB_CPU_ARM_CORTEX_M0
@@ -61,14 +64,19 @@ extern void cmb_flash_log_println(const char *fmt, ...);
 #else
     #error "You must select a CPU platform on menuconfig"
 #endif /* PKG_CMBACKTRACE_PLATFORM_M0_M0PLUS */
+
 /* enable dump stack information */
 #if defined(PKG_CMBACKTRACE_DUMP_STACK)
     #define CMB_USING_DUMP_STACK_INFO
 #endif
+
 /* language of print information */
 #if defined(PKG_CMBACKTRACE_PRINT_ENGLISH)
     #define CMB_PRINT_LANGUAGE         CMB_PRINT_LANGUAGE_ENGLISH
 #elif defined(PKG_CMBACKTRACE_PRINT_CHINESE)
     #define CMB_PRINT_LANGUAGE         CMB_PRINT_LANGUAGE_CHINESE
+#elif defined(PKG_CMBACKTRACE_PRINT_CHINESE_UTF8)
+    #define CMB_PRINT_LANGUAGE         CMB_PRINT_LANGUAGE_CHINESE_UTF8
 #endif /* PKG_CMBACKTRACE_PRINT_ENGLISH */
+
 #endif /* _CMB_CFG_H_ */
