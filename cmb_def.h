@@ -36,27 +36,28 @@
 /* library software version number */
 #define CMB_SW_VERSION                "1.4.0"
 
-#define CMB_CPU_ARM_CORTEX_M0          0
-#define CMB_CPU_ARM_CORTEX_M3          1
-#define CMB_CPU_ARM_CORTEX_M4          2
-#define CMB_CPU_ARM_CORTEX_M7          3
+#define CMB_CPU_ARM_CORTEX_M0             0
+#define CMB_CPU_ARM_CORTEX_M3             1
+#define CMB_CPU_ARM_CORTEX_M4             2
+#define CMB_CPU_ARM_CORTEX_M7             3
 
-#define CMB_OS_PLATFORM_RTT            0
-#define CMB_OS_PLATFORM_UCOSII         1
-#define CMB_OS_PLATFORM_UCOSIII        2
-#define CMB_OS_PLATFORM_FREERTOS       3
+#define CMB_OS_PLATFORM_RTT               0
+#define CMB_OS_PLATFORM_UCOSII            1
+#define CMB_OS_PLATFORM_UCOSIII           2
+#define CMB_OS_PLATFORM_FREERTOS          3
 
-#define CMB_PRINT_LANGUAGE_ENGLISH     0
-#define CMB_PRINT_LANGUAGE_CHINESE     1
+#define CMB_PRINT_LANGUAGE_ENGLISH        0
+#define CMB_PRINT_LANGUAGE_CHINESE        1
+#define CMB_PRINT_LANGUAGE_CHINESE_UTF8   2
 
 /* name max length, default size: 32 */
 #ifndef CMB_NAME_MAX
-#define CMB_NAME_MAX                   32
+#define CMB_NAME_MAX                      32
 #endif
 
 /* print information language, default is English */
 #ifndef CMB_PRINT_LANGUAGE
-#define CMB_PRINT_LANGUAGE             CMB_PRINT_LANGUAGE_ENGLISH
+#define CMB_PRINT_LANGUAGE                CMB_PRINT_LANGUAGE_ENGLISH
 #endif
 
 
