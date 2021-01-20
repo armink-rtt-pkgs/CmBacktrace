@@ -61,8 +61,8 @@
     #error "not supported compiler"
 #endif
 
-RT_WEAK rt_err_t exception_hook(void *context) {
-    volatile uint8_t _continue = 1;
+void rt_cm_backtrace_exception_hook(void *context)
+{
     uint8_t lr_offset = 0;
     uint32_t lr;
 
@@ -113,15 +113,10 @@ RT_WEAK rt_err_t exception_hook(void *context) {
     cm_backtrace_fault(lr, cmb_get_sp() + sizeof(uint32_t) * CMB_SP_WORD_OFFSET);
 
     cmb_println("Current system tick: %ld", rt_tick_get());
-
-    while (_continue == 1);
-
-    return RT_EOK;
 }
 
-RT_WEAK void assert_hook(const char* ex, const char* func, rt_size_t line) {
-    volatile uint8_t _continue = 1;
-
+void rt_cm_backtrace_assert_hook(const char* ex, const char* func, rt_size_t line)
+{
     rt_enter_critical();
 
 #ifdef RT_USING_FINSH
@@ -135,6 +130,22 @@ RT_WEAK void assert_hook(const char* ex, const char* func, rt_size_t line) {
     cm_backtrace_assert(cmb_get_sp());
 
     cmb_println("Current system tick: %ld", rt_tick_get());
+}
+
+RT_WEAK rt_err_t exception_hook(void *context) {
+    volatile uint8_t _continue = 1;
+
+    rt_cm_backtrace_exception_hook(context);
+
+    while (_continue == 1);
+
+    return RT_EOK;
+}
+
+RT_WEAK void assert_hook(const char* ex, const char* func, rt_size_t line) {
+    volatile uint8_t _continue = 1;
+
+    rt_cm_backtrace_assert_hook(ex, func, line);
 
     while (_continue == 1);
 }
