@@ -61,6 +61,8 @@ extern void cmb_flash_log_println(const char *fmt, ...);
     #define CMB_CPU_PLATFORM_TYPE      CMB_CPU_ARM_CORTEX_M4
 #elif defined(PKG_CMBACKTRACE_PLATFORM_M7)
     #define CMB_CPU_PLATFORM_TYPE      CMB_CPU_ARM_CORTEX_M7
+#elif defined(PKG_CMBACKTRACE_PLATFORM_M33)
+    #define CMB_CPU_PLATFORM_TYPE      CMB_CPU_ARM_CORTEX_M33
 #else
     #error "You must select a CPU platform on menuconfig"
 #endif /* PKG_CMBACKTRACE_PLATFORM_M0_M0PLUS */

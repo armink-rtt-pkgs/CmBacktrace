@@ -91,6 +91,9 @@ enum {
     PRINT_UFSR_INVSTATE,
     PRINT_UFSR_INVPC,
     PRINT_UFSR_NOCP,
+#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M33)
+    PRINT_UFSR_STKOF,
+#endif
     PRINT_UFSR_UNALIGNED,
     PRINT_UFSR_DIVBYZERO0,
     PRINT_DFSR_HALTED,
@@ -127,7 +130,8 @@ static bool on_fault = false;
 static bool stack_is_overflow = false;
 static struct cmb_hard_fault_regs regs;
 
-#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M4) || (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M7)
+#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M4) || (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M7) || \
+    (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M33)
 static bool statck_has_fpu_regs = false;
 #endif
 
@@ -336,7 +340,7 @@ size_t cm_backtrace_call_stack(uint32_t *buffer, size_t size, uint32_t sp) {
         }
         /* fix the PC address in thumb mode */
         pc = *((uint32_t *) sp) - 1;
-        if ((pc >= code_start_addr) && (pc <= code_start_addr + code_size) && (depth < CMB_CALL_STACK_MAX_DEPTH)
+        if ((pc >= code_start_addr + sizeof(size_t)) && (pc <= code_start_addr + code_size) && (depth < CMB_CALL_STACK_MAX_DEPTH)
                 /* check the the instruction before PC address is 'BL' or 'BLX' */
                 && disassembly_ins_is_bl_blx(pc - sizeof(size_t)) && (depth < size)) {
             /* the second depth function may be already saved, so need ignore repeat */
@@ -446,7 +450,8 @@ static void fault_diagnosis(void) {
                 cmb_println(print_info[PRINT_MFSR_MSTKERR]);
             }
 
-#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M4) || (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M7)
+#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M4) || (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M7) || \
+    (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M33)
             if (regs.mfsr.bits.MLSPERR) {
                 cmb_println(print_info[PRINT_MFSR_MLSPERR]);
             }
@@ -476,7 +481,8 @@ static void fault_diagnosis(void) {
                 cmb_println(print_info[PRINT_BFSR_STKERR]);
             }
 
-#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M4) || (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M7)
+#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M4) || (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M7) || \
+    (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M33)
             if (regs.bfsr.bits.LSPERR) {
                 cmb_println(print_info[PRINT_BFSR_LSPERR]);
             }
@@ -503,6 +509,11 @@ static void fault_diagnosis(void) {
             if (regs.ufsr.bits.NOCP) {
                 cmb_println(print_info[PRINT_UFSR_NOCP]);
             }
+#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M33)
+            if (regs.ufsr.bits.STKOF) {
+                cmb_println(print_info[PRINT_UFSR_STKOF]);
+            }
+#endif
             if (regs.ufsr.bits.UNALIGNED) {
                 cmb_println(print_info[PRINT_UFSR_UNALIGNED]);
             }
@@ -534,7 +545,8 @@ static void fault_diagnosis(void) {
 }
 #endif /* (CMB_CPU_PLATFORM_TYPE != CMB_CPU_ARM_CORTEX_M0) */
 
-#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M4) || (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M7)
+#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M4) || (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M7) || \
+    (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M33)
 static uint32_t statck_del_fpu_regs(uint32_t fault_handler_lr, uint32_t sp) {
     statck_has_fpu_regs = (fault_handler_lr & (1UL << 4)) == 0 ? true : false;
 
@@ -590,7 +602,8 @@ void cm_backtrace_fault(uint32_t fault_handler_lr, uint32_t fault_handler_sp) {
     /* delete saved R0~R3, R12, LR,PC,xPSR registers space */
     stack_pointer += sizeof(size_t) * 8;
 
-#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M4) || (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M7)
+#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M4) || (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M7) || \
+    (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M33)
     stack_pointer = statck_del_fpu_regs(fault_handler_lr, stack_pointer);
 #endif /* (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M4) || (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M7) */
 

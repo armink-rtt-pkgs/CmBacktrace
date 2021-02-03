@@ -5,6 +5,8 @@ cwd     = GetCurrentDir()
 src     = Glob('*.c')
 path    = [cwd]
 
+# AC5 use option '--c99'
+'''
 LOCAL_CCFLAGS = ''
 
 if rtconfig.CROSS_TOOL == 'gcc':
@@ -17,5 +19,11 @@ elif rtconfig.CROSS_TOOL == 'keil':
     # pass
 
 group = DefineGroup('cm_backtrace', src, depend = ['PKG_USING_CMBACKTRACE'], CPPPATH = path, LOCAL_CCFLAGS = LOCAL_CCFLAGS)
+'''
+
+#
+# armclang complier not support option '--c99'
+#
+group = DefineGroup('cm_backtrace', src, depend = ['PKG_USING_CMBACKTRACE'], CPPPATH = path)
 
 Return('group')
