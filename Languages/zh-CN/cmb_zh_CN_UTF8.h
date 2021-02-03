@@ -57,6 +57,9 @@
 [PRINT_UFSR_INVSTATE]         = "发生用法错误，原因：试图切换到 ARM 状态",
 [PRINT_UFSR_INVPC]            = "发生用法错误，原因：无效的异常返回码",
 [PRINT_UFSR_NOCP]             = "发生用法错误，原因：企图执行协处理器指令",
+#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M33)
+    [PRINT_UFSR_STKOF]        = "发生用法错误，原因：硬件检测到栈溢出",
+#endif
 [PRINT_UFSR_UNALIGNED]        = "发生用法错误，原因：企图执行非对齐访问",
 [PRINT_UFSR_DIVBYZERO0]       = "发生用法错误，原因：企图执行除 0 操作",
 [PRINT_DFSR_HALTED]           = "发生调试错误，原因：NVIC 停机请求",
