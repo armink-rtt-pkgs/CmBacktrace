@@ -82,7 +82,6 @@ void rt_cm_backtrace_exception_hook(void *context)
 #define EXC_RETURN_STACKING_RULE_MASK    (1UL << 5)    /* always 1: default rules for stacking the callee register */
 #define EXC_RETURN_SECURE_STACK_MASK     (1UL << 6)    /* always 0: Non-secure stack used */
 
-    volatile uint8_t _continue = 1;
     uint8_t lr_offset = 0;
     uint32_t lr;
     uint32_t *other_info_sp = 0;
@@ -179,30 +178,6 @@ void rt_cm_backtrace_exception_hook(void *context)
     cmb_println("==============================================================");
 
     cmb_println("Current system tick: %ld", rt_tick_get());
-
-    while (_continue == 1);
-
-    return RT_EOK;
-}
-
-RT_WEAK void rt_cm_backtrace_exception_hook(const char* ex, const char* func, rt_size_t line) {
-    volatile uint8_t _continue = 1;
-
-    rt_enter_critical();
-
-#ifdef RT_USING_FINSH
-    extern long list_thread(void);
-    list_thread();
-#endif
-
-    cmb_println("");
-    cmb_println("(%s) has assert failed at %s:%ld.", ex, func, line);
-
-    cm_backtrace_assert(cmb_get_sp());
-
-    cmb_println("Current system tick: %ld", rt_tick_get());
-
-    while (_continue == 1);
 }
 
 #else
