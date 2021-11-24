@@ -50,7 +50,9 @@ extern void cmb_flash_log_println(const char *fmt, ...);
 /* enable OS platform */
 #define CMB_USING_OS_PLATFORM
 /* OS platform type, must config when CMB_USING_OS_PLATFORM is enable */
+#ifdef __RTTHREAD__
 #define CMB_OS_PLATFORM_TYPE           CMB_OS_PLATFORM_RTT
+#endif
 
 /* cpu platform type, must config by user */
 #if defined(PKG_CMBACKTRACE_PLATFORM_M0_M0PLUS)
