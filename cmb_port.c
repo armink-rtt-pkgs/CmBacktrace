@@ -221,11 +221,7 @@ void rt_cm_backtrace_exception_hook(void *context)
          * Cortex-M4: http://infocenter.arm.com/help/topic/com.arm.doc.dui0553b/DUI0553.pdf P41
          * Cortex-M7: http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0646c/Babefdjc.html
          */
-        if ((lr == 0xFFFFFFF1) || (lr == 0xFFFFFFF9) || (lr == 0xFFFFFFFD)
-#if (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M4) || (CMB_CPU_PLATFORM_TYPE == CMB_CPU_ARM_CORTEX_M3)
-            || (lr == 0xFFFFFFE1) || (lr == 0xFFFFFFE9) || (lr == 0xFFFFFFED)
-#endif
-           )
+        if ((lr == 0xFFFFFFF1) || (lr == 0xFFFFFFF9) || (lr == 0xFFFFFFFD) || (lr == 0xFFFFFFE1) || (lr == 0xFFFFFFE9) || (lr == 0xFFFFFFED))
         {
             break;
         }
