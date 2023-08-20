@@ -34,7 +34,7 @@
 #include <stdlib.h>
 
 /* library software version number */
-#define CMB_SW_VERSION                "1.4.1"
+#define CMB_SW_VERSION                "1.4.2"
 
 #define CMB_CPU_ARM_CORTEX_M0             0
 #define CMB_CPU_ARM_CORTEX_M3             1
@@ -46,6 +46,7 @@
 #define CMB_OS_PLATFORM_UCOSII            1
 #define CMB_OS_PLATFORM_UCOSIII           2
 #define CMB_OS_PLATFORM_FREERTOS          3
+#define CMB_OS_PLATFORM_RTX5              4
 
 #define CMB_PRINT_LANGUAGE_ENGLISH        0
 #define CMB_PRINT_LANGUAGE_CHINESE        1
@@ -101,9 +102,17 @@
     #error "not supported compiler"
 #endif
 
-/* supported function call stack max depth, default is 16 */
+/* supported function call stack max depth, default is 32 */
 #ifndef CMB_CALL_STACK_MAX_DEPTH
-#define CMB_CALL_STACK_MAX_DEPTH       16
+#define CMB_CALL_STACK_MAX_DEPTH       32
+#endif
+
+/* 
+ * The maximum print depth in case of exception prevents
+ * too much stack information from printing and insufficient log space
+ */
+#ifndef CMB_DUMP_STACK_DEPTH_SIZE
+#define CMB_DUMP_STACK_DEPTH_SIZE     (16)
 #endif
 
 /* system handler control and state register */
@@ -301,7 +310,7 @@ if (!(EXPR))                                                                   \
 }
 
 /* ELF(Executable and Linking Format) file extension name for each compiler */
-#if defined(__ARMCC_VERSION)
+#if defined(__CC_ARM) || defined(__CLANG_ARM) || defined(__ARMCC_VERSION)
     #define CMB_ELF_FILE_EXTENSION_NAME          ".axf"
 #elif defined(__ICCARM__)
     #define CMB_ELF_FILE_EXTENSION_NAME          ".out"
@@ -336,6 +345,8 @@ if (!(EXPR))                                                                   \
         extern uint32_t *vTaskStackAddr(void);/* need to modify the FreeRTOS/tasks source code */
         extern uint32_t vTaskStackSize(void);
         extern char * vTaskName(void);
+    #elif (CMB_OS_PLATFORM_TYPE == CMB_OS_PLATFORM_RTX5)
+        #include "rtx_os.h"
     #else
         #error "not supported OS type"
     #endif /* (CMB_OS_PLATFORM_TYPE == CMB_OS_PLATFORM_RTT) */
@@ -355,7 +366,7 @@ if (!(EXPR))                                                                   \
         mov r0, sp
         bx lr
     }
-#elif defined(__clang__)
+#elif defined(__CLANG_ARM)
     __attribute__( (always_inline) ) static __inline uint32_t cmb_get_msp(void) {
         uint32_t result;
         __asm volatile ("mrs %0, msp" : "=r" (result) );

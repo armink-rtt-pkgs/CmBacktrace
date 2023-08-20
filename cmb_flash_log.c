@@ -61,7 +61,13 @@ static const struct fal_partition *cmb_log_part = NULL;
  */
 void cmb_flash_log_write(const char *log, size_t len)
 {
+
     static uint32_t addr = 0;
+
+    /* addr out of partition length */
+    if(addr >= cmb_log_part->len)
+        return;
+
     uint8_t len_buf[CMB_LOG_LEN_SIZE] = { 0 };
     static rt_bool_t first_write = RT_TRUE;
 
@@ -138,15 +144,20 @@ int cmb_backup_flash_log_to_file(void)
     RT_ASSERT(cmb_log_part != NULL);
 
     size_t len;
+    int result = 0;
     uint32_t addr = 0;
     rt_bool_t has_read_log = RT_FALSE;
     int log_fd = -1;
 
     while (1)
     {
-        fal_partition_read(cmb_log_part, addr, (uint8_t *)&len, sizeof(size_t));
-        if (len != 0xFFFFFFFF)
+        result = fal_partition_read(cmb_log_part, addr, (uint8_t *)&len, sizeof(size_t));
+        if ((len != 0xFFFFFFFF) && (result >= 0))
         {
+            /* addr out of partition length */
+            if(addr >= cmb_log_part->len)
+                break;
+
             char log_buf[ULOG_LINE_BUF_SIZE];
 
             if (!has_read_log)
@@ -162,7 +173,11 @@ int cmb_backup_flash_log_to_file(void)
             }
             addr += CMB_LOG_LEN_SIZE;
             /* read log content */
-            fal_partition_read(cmb_log_part, addr, (uint8_t *)log_buf, MIN(ULOG_LINE_BUF_SIZE, len));
+            result = fal_partition_read(cmb_log_part, addr, (uint8_t *)log_buf, MIN(ULOG_LINE_BUF_SIZE, len));
+            if (result < 0)
+            {
+                break;
+            }
             addr += RT_ALIGN(len, CMB_FLASH_LOG_PART_WG);
             /* backup log to file */
             write(log_fd, log_buf, MIN(ULOG_LINE_BUF_SIZE, len));
