@@ -422,4 +422,8 @@ if (!(EXPR))                                                                   \
     #error "not supported compiler"
 #endif
 
+#ifndef RT_WEAK
+#define RT_WEAK rt_weak
+#endif
+
 #endif /* _CMB_DEF_H_ */
