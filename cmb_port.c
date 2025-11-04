@@ -246,6 +246,7 @@ void rt_cm_backtrace_exception_hook(void *context)
 
 void rt_cm_backtrace_assert_hook(const char* ex, const char* func, rt_size_t line)
 {
+    rt_enter_critical();
     rt_interrupt_enter();
 
 #ifdef RT_USING_FINSH
@@ -261,6 +262,7 @@ void rt_cm_backtrace_assert_hook(const char* ex, const char* func, rt_size_t lin
     cmb_println("Current system tick: %ld", rt_tick_get());
 
     rt_interrupt_leave();
+    rt_exit_critical();
 }
 
 RT_WEAK rt_err_t exception_hook(void *context) {
