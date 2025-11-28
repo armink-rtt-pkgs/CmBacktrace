@@ -16,17 +16,23 @@
 #include <stdio.h>
 #include <cm_backtrace.h>
 
-//#define CMB_USING_FAL_FLASH_LOG
-//#define CMB_USING_FAL_BACKUP_LOG_TO_FILE
-
 #if defined(CMB_USING_FAL_FLASH_LOG)
 
+#include <fal.h>
+
+#if RT_VER_NUM < 0x40100
+#include <dfs_posix.h>
 #if !defined(PKG_USING_FAL) || !defined(RT_USING_DFS)
 #error "please enable the FAL package and DFS component"
 #endif
+#else
+#if !defined(RT_USING_FAL) || !defined(RT_USING_DFS)
+#error "please enable the FAL package and DFS component"
+#endif
+#include <dfs_file.h>
+#include <unistd.h>
+#endif /* RT_VER_NUM check */
 
-#include <fal.h>
-#include <dfs_posix.h>
 
 #ifndef CMB_FAL_FLASH_LOG_PART
 #define CMB_FAL_FLASH_LOG_PART         "cmb_log"
@@ -109,9 +115,11 @@ int ulog_cmb_flash_log_backend_init(void)
 
     ulog_backend_register(&backend, "cmb_flash_log", RT_FALSE);
 
+    backend.is_emergency_backend = RT_TRUE;
+
     return 0;
 }
-INIT_APP_EXPORT(ulog_cmb_flash_log_backend_init);
+INIT_FS_EXPORT(ulog_cmb_flash_log_backend_init);
 
 #else
 void cmb_flash_log_println(const char *fmt, ...)
@@ -212,7 +220,7 @@ int cmb_backup_flash_log_to_file(void)
 
     return 0;
 }
-INIT_APP_EXPORT(cmb_backup_flash_log_to_file);
+INIT_FS_EXPORT(cmb_backup_flash_log_to_file);
 #endif /* CMB_USING_FAL_BACKUP_LOG_TO_FILE */
 
 #endif /* defined(CMB_USING_FLASH_LOG_BACKUP) */

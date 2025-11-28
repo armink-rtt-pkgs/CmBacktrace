@@ -42,7 +42,7 @@ extern void cmb_flash_log_println(const char *fmt, ...);
 #else
 #include <ulog.h>
 #define CMB_LOG_TAG                    "cmb"
-#define cmb_println(...)               ulog_e(CMB_LOG_TAG, __VA_ARGS__);ulog_flush()
+#define cmb_println(...)               ulog_e(CMB_LOG_TAG, __VA_ARGS__);ulog_emergency_flush()
 #endif /* RT_USING_ULOG */
 
 /* enable bare metal(no OS) platform */
