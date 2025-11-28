@@ -206,8 +206,15 @@ void rt_cm_backtrace_exception_hook(void *context)
     list_thread();
 #endif
 
+#if ((defined (__CC_ARM) && defined (__TARGET_FPU_VFP)) \
+     || (defined (__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050) && defined (__ARM_PCS_VFP)) \
+     || (defined (__ICCARM__) && defined (__ARMVFP__)) \
+     || (defined (__GNUC__) && defined (__VFP_FP__) && !defined (__SOFTFP__)) )
+#define USE_FPU
+#endif
+
     /* the PSP is changed by RT-Thread HardFault_Handler, so restore it to HardFault context */
-#if (defined (__VFP_FP__) && !defined(__SOFTFP__)) || (defined (__ARMVFP__)) || (defined(__ARM_PCS_VFP) || defined(__TARGET_FPU_VFP))
+#ifdef USE_FPU
     cmb_set_psp(cmb_get_psp() + 4 * 10);
 #else
     cmb_set_psp(cmb_get_psp() + 4 * 9);
@@ -239,6 +246,7 @@ void rt_cm_backtrace_exception_hook(void *context)
 
 void rt_cm_backtrace_assert_hook(const char* ex, const char* func, rt_size_t line)
 {
+    rt_enter_critical();
     rt_interrupt_enter();
 
 #ifdef RT_USING_FINSH
@@ -254,6 +262,7 @@ void rt_cm_backtrace_assert_hook(const char* ex, const char* func, rt_size_t lin
     cmb_println("Current system tick: %ld", rt_tick_get());
 
     rt_interrupt_leave();
+    rt_exit_critical();
 }
 
 RT_WEAK rt_err_t exception_hook(void *context) {
