@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2019, RT-Thread Development Team
+ * Copyright (c) 2006-2025 RT-Thread Development Team
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -155,8 +155,19 @@ int cmb_backup_flash_log_to_file(void)
         if ((len != 0xFFFFFFFF) && (result >= 0))
         {
             /* addr out of partition length */
-            if(addr >= cmb_log_part->len)
+            if((addr >= cmb_log_part->len) || (len > cmb_log_part->len))
+            {
+                /* Seeing garbled text (len is very large) indicates that the partition is corrupted.
+                 * Erase it to fix the issue, otherwise, it will still get to this point the next time you boot.
+                 */
+                if (len > cmb_log_part->len)
+                {
+                    LOG_E("The partition is corrupted. Erasing it to fix the issue.");
+                    has_read_log = RT_FALSE;
+                    fal_partition_erase_all(cmb_log_part);
+                }
                 break;
+            }
 
             char log_buf[ULOG_LINE_BUF_SIZE];
 
@@ -164,9 +175,10 @@ int cmb_backup_flash_log_to_file(void)
             {
                 has_read_log = RT_TRUE;
                 LOG_I("An CmBacktrace log was found on flash. Now will backup it to file ("CMB_LOG_FILE_PATH").");
-                //TODO check the folder
+                /*TODO check the folder*/
                 log_fd = open(CMB_LOG_FILE_PATH, O_WRONLY | O_CREAT | O_APPEND);
-                if (log_fd < 0) {
+                if (log_fd < 0)
+                {
                     LOG_E("Open file ("CMB_LOG_FILE_PATH") failed.");
                     break;
                 }
