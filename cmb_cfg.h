@@ -33,12 +33,12 @@
 #include <rtthread.h>
 
 #ifndef RT_USING_ULOG
-#ifndef CMB_USING_FLASH_LOG_BACKUP
+#ifndef CMB_USING_FAL_FLASH_LOG
 #define cmb_println(...)               rt_kprintf(__VA_ARGS__);rt_kprintf("\r\n")
 #else
 extern void cmb_flash_log_println(const char *fmt, ...);
 #define cmb_println(...)               rt_kprintf(__VA_ARGS__);rt_kprintf("\r\n");cmb_flash_log_println(__VA_ARGS__)
-#endif /* CMB_USING_FLASH_LOG_BACKUP */
+#endif /* !CMB_USING_FAL_FLASH_LOG */
 #else
 #include <ulog.h>
 #define CMB_LOG_TAG                    "cmb"
